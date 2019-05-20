@@ -18,6 +18,9 @@ func NewPropertSet(store spi.Store) *PropertSet {
 		func() spi.Function {
 			return new(functions.ChangeOwner)
 		},
+		func() spi.Function {
+			return new(functions.CopyTo)
+		},
 	)
 
 	return c
