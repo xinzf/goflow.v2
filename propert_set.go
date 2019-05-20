@@ -15,6 +15,9 @@ func NewPropertSet(store spi.Store) *PropertSet {
 		func() spi.Function {
 			return new(functions.CanJoin)
 		},
+		func() spi.Function {
+			return new(functions.ChangeOwner)
+		},
 	)
 
 	return c

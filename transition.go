@@ -513,8 +513,7 @@ func (this *Transition) getNextStepId(step string) int {
 
 func (this *Transition) isExit(result definition.Result) bool {
 	nextStepId := this.getNextStepId(result.Step)
-	currentStep := this.vars.Get(tools.CurrentStep).GetData().(spi.Step)
-	if result.Join > 0 || result.Split > 0 || nextStepId == -2 || (nextStepId > 0 && nextStepId != currentStep.GetStepId()) {
+	if result.Join > 0 || result.Split > 0 || nextStepId == -2 || nextStepId > 0 {
 		return true
 	}
 	return false

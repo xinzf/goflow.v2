@@ -44,6 +44,8 @@ type Step interface {
 	// 获取实际完成时间
 	GetFinishDate() time.Time
 
+	SetOwner(uid int)
+
 	SetCaller(uid int)
 
 	// 获取实际完成人
