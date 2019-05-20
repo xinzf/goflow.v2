@@ -55,4 +55,6 @@ type Store interface {
 	DeleteJoinTransition(entryId string, nextStepId int) error
 
 	DeleteJoinTransitionByPrevIds(entryId string, prevIds []int) (err error)
+
+	GetConn() interface{}
 }
