@@ -10,6 +10,7 @@ type Workflow struct {
 	Version  string `xml:"version,attr"`
 	Describe string `xml:"describe,attr"`
 	Name     string `xml:"name,attr"`
+	Prefix   string `xml:"prefix,attr"`
 	Steps    Steps  `xml:"steps"`
 	Joins    Joins  `xml:"joins"`
 	Splits   Splits `xml:"splits"`
