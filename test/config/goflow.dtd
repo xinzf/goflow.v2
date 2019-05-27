@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!ELEMENT workflow (steps,joins*,splits*)>
+<!ELEMENT workflow (extends?,steps,joins*,splits*)>
 
 <!ATTLIST workflow
         id CDATA #REQUIRED
@@ -8,10 +8,12 @@
         version CDATA #REQUIRED
         >
 
+<!ELEMENT extends ANY >
+
 <!ELEMENT steps (step+) >
 <!ATTLIST steps
         start CDATA #REQUIRED
-        end CDATA #REQUIRED
+        <!--end CDATA #REQUIRED-->
         start-init-status #REQUIRED
         >
 

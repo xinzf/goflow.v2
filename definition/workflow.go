@@ -3,21 +3,34 @@ package definition
 import (
 	"encoding/json"
 	"encoding/xml"
+	"github.com/pkg/errors"
+	"reflect"
 )
 
 type Workflow struct {
-	ID       string `xml:"id,attr"`
-	Version  string `xml:"version,attr"`
-	Describe string `xml:"describe,attr"`
-	Name     string `xml:"name,attr"`
-	Prefix   string `xml:"prefix,attr"`
-	Steps    Steps  `xml:"steps"`
-	Joins    Joins  `xml:"joins"`
-	Splits   Splits `xml:"splits"`
+	ID       string  `xml:"id,attr"`
+	Version  string  `xml:"version,attr"`
+	Describe string  `xml:"describe,attr"`
+	Name     string  `xml:"name,attr"`
+	Prefix   string  `xml:"prefix,attr"`
+	Steps    Steps   `xml:"steps"`
+	Joins    Joins   `xml:"joins"`
+	Splits   Splits  `xml:"splits"`
+	Extends  Extends `xml:"extends"`
 }
 
 func (static Workflow) GetStartStep() (Step, bool) {
 	return static.GetStep(static.Steps.Start)
+}
+
+func (static Workflow) BindExtends(obj interface{}) error {
+	if reflect.TypeOf(obj).Kind() != reflect.Ptr {
+		return errors.New("Extend 不是有效的指针")
+	}
+
+	//log.Println(static.Extends)
+	return xml.Unmarshal([]byte(static.Extends.Text), obj)
+	return nil
 }
 
 func (static Workflow) GetStep(id int) (Step, bool) {

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/xinzf/goflow.v2/spi"
 	"github.com/xinzf/goflow.v2/tools"
-	"log"
 )
 
 type ChangeOwner struct {
@@ -15,7 +14,6 @@ func (this *ChangeOwner) GetName() string {
 }
 
 func (this *ChangeOwner) Eval(store spi.Store, transientVars *tools.TransientVars, args map[string]*tools.Value) (interface{}, error) {
-	log.Printf("%+v",args)
 	val, ok := args["uid"]
 	if !ok {
 		return nil, errors.New("function: changeOwner 缺少参数: task_uid")

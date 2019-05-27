@@ -107,9 +107,10 @@ func (this *Value) Bind(obj interface{}) error {
 		return errors.New("Argument is not a pointer at Value:Bind")
 	}
 
-	if this.kind.String() != reflect.TypeOf(obj).Kind().String() {
-		return errors.New("The value type is not the argument type")
-	}
+	//logrus.Debugln("this.kind: ",this.kind.String(),"obj.kind: ",reflect.TypeOf(obj).Kind().String())
+	//if this.kind.String() != reflect.TypeOf(obj).Kind().String() {
+	//	return errors.New("The value type is not the argument type")
+	//}
 
 	b, err := jsoniter.Marshal(this.data)
 	if err != nil {

@@ -22,7 +22,23 @@ func (this *CopyTo) Eval(store spi.Store, transientVars *tools.TransientVars, ar
 		return nil, errors.New("function:copyTo 缺少参数：users")
 	}
 
-	userIds := users.IntSlice(",")
+	var userIds = make([]int, 0)
+	if key, ok := users.ParseVariable(); ok {
+		if key == "leader" {
+			userInfo, _, err := models.User{}.Detail(transientVars.Get(tools.Caller).Int())
+			if err != nil {
+				return nil, err
+			}
+			leader, err := userInfo.GetMyLeader()
+			if err != nil {
+				return nil, err
+			}
+			userIds = append(userIds, leader.GetId())
+		}
+	} else {
+		userIds = users.IntSlice(",")
+	}
+
 	if len(userIds) == 0 {
 		return nil, errors.New("function:copyTo 缺少参数：users")
 	}

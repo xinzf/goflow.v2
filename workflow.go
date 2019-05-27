@@ -20,7 +20,9 @@ func NewWorkflow(caller int, set *PropertSet) *Workflow {
 	return wf
 }
 
-func (this *Workflow) Initialize(flowId string, actionName, remark string, inputs ...map[string]interface{}) (string, error) {
+func (this *Workflow) Initialize(flowId string, actionName, remark string, inputs interface{}) (string, error) {
+	this.transientVars.Put(tools.Inputs, inputs)
+
 	store := this.propertset.GetStore()
 
 	// 获取工作流定义

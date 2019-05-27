@@ -1,8 +1,8 @@
 package definition
 
 type Steps struct {
-	Start           int    `xml:"start,attr"`
-	End             int    `xml:"end,attr"`
+	Start int `xml:"start,attr"`
+	//End             int    `xml:"end,attr"`
 	Steps           []Step `xml:"step"`
 	StartInitStatus string `xml:"start-init-status,attr"`
 }

@@ -10,6 +10,7 @@ const (
 	CurrentStep string = "current_step"
 	Workflow    string = "workflow"
 	Caller      string = "caller"
+	Inputs      string = "inputs"
 )
 
 func NewTransientVars() *TransientVars {
