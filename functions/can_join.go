@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/xinzf/goflow.v2/spi"
 	"github.com/xinzf/goflow.v2/tools"
 )
@@ -19,6 +20,17 @@ func (this *CanJoin) Eval(store spi.Store, transientVars *tools.TransientVars, a
 		if args["state"].String() == currentStep.GetState() && args["action"].String() == currentStep.GetActionName() {
 			return true, nil
 		}
+		return false, nil
+	}
+
+	_, found, err := store.FindCurrentStep(
+		transientVars.Get(tools.Entry).GetData().(spi.Entry).GetEntryId(),
+		args["step_id"].Int(),
+	)
+	if err != nil {
+		return false, err
+	}
+	if found {
 		return false, nil
 	}
 

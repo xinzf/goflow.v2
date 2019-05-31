@@ -269,6 +269,8 @@ func (this *Transition) transition(workflow definition.Workflow, currentStep spi
 			return err
 		}
 
+		this.vars.Put(tools.NewSteps, []int{newCurrentStep.GetStepId()})
+
 		trans := NewTransition(
 			this.properSet,
 			this.vars,
@@ -354,6 +356,8 @@ func (this *Transition) transition(workflow definition.Workflow, currentStep spi
 			return err
 		}
 
+		this.vars.Put(tools.NewSteps, []int{newCurrentStep.GetStepId()})
+
 		trans := NewTransition(
 			this.properSet,
 			this.vars,
@@ -373,6 +377,7 @@ func (this *Transition) transition(workflow definition.Workflow, currentStep spi
 			return err
 		}
 
+		newSteps := make([]int, 0)
 		for _, result = range results {
 			nextStep, found := workflow.GetStep(this.getNextStepId(result.Step))
 			if !found {
@@ -397,6 +402,7 @@ func (this *Transition) transition(workflow definition.Workflow, currentStep spi
 			if err != nil {
 				return err
 			}
+			newSteps = append(newSteps, newCurrentStep.GetStepId())
 
 			trans := NewTransition(
 				this.properSet,
@@ -408,6 +414,7 @@ func (this *Transition) transition(workflow definition.Workflow, currentStep spi
 				return err
 			}
 		}
+		this.vars.Put(tools.NewSteps, newSteps)
 
 		return nil
 	}
@@ -508,6 +515,8 @@ func (this *Transition) getNextStepId(step string) int {
 	} else {
 		nextStep = val.Int()
 	}
+
+	logrus.Println("nextStep:",nextStep)
 	return nextStep
 }
 

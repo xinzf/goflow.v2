@@ -71,7 +71,9 @@ func (this *Workflow) Initialize(flowId string, actionName, remark string, input
 	return entry.GetEntryId(), nil
 }
 
-func (this *Workflow) DoAction(entryId string, stepId int, actionName, remark string, inputs ...map[string]interface{}) error {
+func (this *Workflow) DoAction(entryId string, stepId int, actionName, remark string, inputs interface{}) error {
+	this.transientVars.Put(tools.Inputs, inputs)
+
 	store := this.propertset.GetStore()
 
 	entry, err := store.FindEntry(entryId)
