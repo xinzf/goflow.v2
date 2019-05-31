@@ -11,6 +11,7 @@ const (
 	Workflow    string = "workflow"
 	Caller      string = "caller"
 	Inputs      string = "inputs"
+	NewSteps    string = "new_steps"
 )
 
 func NewTransientVars() *TransientVars {
@@ -26,6 +27,7 @@ func (this *TransientVars) Put(key string, val interface{}) {
 }
 
 func (this *TransientVars) Get(key string) *Value {
+	//logrus.Println(key)
 	if v, found := this.data.Get(key); found {
 		return v.(*Value)
 	}

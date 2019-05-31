@@ -1,7 +1,6 @@
 package functions
 
 import (
-	"github.com/sirupsen/logrus"
 	"github.com/xinzf/goflow.v2/spi"
 	"github.com/xinzf/goflow.v2/tools"
 )

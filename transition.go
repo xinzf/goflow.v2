@@ -516,7 +516,6 @@ func (this *Transition) getNextStepId(step string) int {
 		nextStep = val.Int()
 	}
 
-	logrus.Println("nextStep:",nextStep)
 	return nextStep
 }
 
