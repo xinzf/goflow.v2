@@ -299,14 +299,14 @@ func (this *Transition) transition(workflow definition.Workflow, currentStep spi
 		if verify, err := this.evalConditions(result.Conditions); err != nil {
 			return err
 		} else if !verify {
-			t, err := this.properSet.GetStore().GetJoinTransitionsByPrevId(entry.GetEntryId(), currentStep.GetStepId())
-			if err != nil {
-				return err
-			}
-			if t.GetPrevId() != currentStep.GetStepId() {
-				err = this.properSet.GetStore().CreateJoinTransition(entry.GetEntryId(), currentStep, nextStepId)
-				return err
-			}
+			//t, err := this.properSet.GetStore().GetJoinTransitionsByPrevId(entry.GetEntryId(), currentStep.GetStepId())
+			//if err != nil {
+			//	return err
+			//}
+			//if t.GetPrevId() != currentStep.GetStepId() {
+			//	err = this.properSet.GetStore().CreateJoinTransition(entry.GetEntryId(), currentStep, nextStepId)
+			//	return err
+			//}
 			return nil
 		}
 
@@ -320,25 +320,41 @@ func (this *Transition) transition(workflow definition.Workflow, currentStep spi
 			return err
 		}
 
-		joinTransition, err := this.properSet.GetStore().GetJoinTransitionsByNextId(entry.GetEntryId(), nextStepId)
-		if err != nil {
-			return err
-		}
-
-		if err = this.properSet.GetStore().DeleteJoinTransition(entry.GetEntryId(), nextStepId); err != nil {
-			return err
-		}
+		//joinTransition, err := this.properSet.GetStore().GetJoinTransitionsByNextId(entry.GetEntryId(), nextStepId)
+		//if err != nil {
+		//	return err
+		//}
+		//
+		//if err = this.properSet.GetStore().DeleteJoinTransition(entry.GetEntryId(), nextStepId); err != nil {
+		//	return err
+		//}
+		//for _,r:=range join.Results.Results{
+		//	r.Step
+		//}
 
 		prevIds := make([]int, 0)
-		for _, j := range joinTransition {
-			joinStep, err := this.properSet.GetStore().FindMostRecentHistory(entry.GetEntryId(), j.GetPrevId())
-			if err != nil {
-				return err
-			}
+		steps := workflow.GetSteps()
+		for _, s := range steps {
+			if s.IsTheJoin(join.Id) {
+				stepHistory, err := this.properSet.GetStore().FindMostRecentHistory(entry.GetEntryId(), s.ID)
+				if err != nil {
+					return err
+				}
 
-			prevIds = append(prevIds, joinStep.GetPrevIds()...)
-			prevIds = append(prevIds, j.GetPrevId())
+				prevIds = append(prevIds, stepHistory.GetPrevIds()...)
+				prevIds = append(prevIds, stepHistory.GetStepId())
+			}
 		}
+
+		//for _, j := range joinTransition {
+		//	joinStep, err := this.properSet.GetStore().FindMostRecentHistory(entry.GetEntryId(), j.GetPrevId())
+		//	if err != nil {
+		//		return err
+		//	}
+
+		//prevIds = append(prevIds, joinStep.GetPrevIds()...)
+		//prevIds = append(prevIds, j.GetPrevId())
+		//}
 		prevIds = append(prevIds, currentStep.GetPrevIds()...)
 		prevIds = append(prevIds, currentStep.GetStepId())
 		prevIds = removeReapetStepIds(prevIds)
@@ -619,80 +635,169 @@ func (this *Transition) isPrevId(stepId int, prevIds []int) bool {
 }
 
 // 回退操作
-func (this *Transition) rollback(step definition.Step, owner int, dueTime time.Time, state string) error {
-	logrus.Debugln("查询案件")
-	entry := this.vars.Get(tools.Entry).GetData().(spi.Entry)
+//func (this *Transition) rollback(step definition.Step, owner int, dueTime time.Time, state string) error {
+//	logrus.Debugln("查询案件")
+//	entry := this.vars.Get(tools.Entry).GetData().(spi.Entry)
+//
+//	logrus.Println("查询所有正在进行中的步骤")
+//	allCurrentSteps, err := this.properSet.store.FindAllCurrentStep(entry.GetEntryId())
+//	deleteIds := make([]int, 0)
+//	//deleteIds := []int{
+//	//	step.ID,
+//	//}
+//	for _, s := range allCurrentSteps {
+//		// 如果要回退的步骤存在于这些步骤的前置中
+//		// 那么就删除这些步骤
+//		if this.isPrevId(step.ID, s.GetPrevIds()) {
+//			deleteIds = append(deleteIds, s.GetStepId())
+//		}
+//	}
+//	logrus.Debugln("得到了要删除的进行中的步骤：", deleteIds)
+//	logrus.Debugln("删除进行中的步骤")
+//	if err = this.properSet.store.DeleteCurrentSteps(deleteIds); err != nil {
+//		return err
+//	}
+//
+//	history, err := this.properSet.store.FindHistorySteps(entry.GetEntryId())
+//	if err != nil {
+//		return err
+//	}
+//
+//	// @todo 这里要加注释，很难说清楚
+//	for _, h := range history {
+//		deleteIds = append(deleteIds, h.GetStepId())
+//	}
+//
+//	logrus.Debugln("删除所有的join关系")
+//	// 删除所有与当前步骤是兄弟步骤的 Join_transition 记录
+//	// prev_ids 来源于 deleteIds，因为 deleteIds 代表的是所有要回退的步骤
+//	// 那么理所当然的是这些要回退的步骤也要从 join_transition 中删除（因为没有必要等待，后续还会重新生成这些步骤）
+//	deleteIds = append(deleteIds, step.ID)
+//	if err = this.properSet.store.DeleteJoinTransitionByPrevIds(entry.GetEntryId(), deleteIds); err != nil {
+//		return err
+//	}
+//
+//	logrus.Debugln("移动步骤到历史记录")
+//	// 从历史记录中找出之前的记录并把 prev_ids 置为其前置ID
+//	historyStep, err := this.properSet.store.FindMostRecentHistory(entry.GetEntryId(), step.ID)
+//	if err != nil {
+//		return err
+//	}
+//
+//	prevIds := historyStep.GetPrevIds()
+//	logrus.Debugln("创建新的步骤")
+//	// 创建新的步骤
+//	newCurrentStep, err := this.properSet.store.CreateCurrentStep(
+//		entry.GetEntryId(),
+//		this.vars.Get(tools.Workflow).GetData().(definition.Workflow),
+//		step,
+//		owner,
+//		dueTime,
+//		state,
+//		prevIds,
+//	)
+//
+//	// 发起新路程并进入该步骤
+//	trans := NewTransition(
+//		this.properSet,
+//		this.vars,
+//		this.vars.Get(tools.CurrentStep).GetData().(spi.Step),
+//		newCurrentStep,
+//	)
+//
+//	logrus.Debugln("进入新创建的步骤")
+//	if err = trans.Enter(); err != nil {
+//		return err
+//	}
+//
+//	return nil
+//}
 
-	logrus.Println("查询所有正在进行中的步骤")
-	allCurrentSteps, err := this.properSet.store.FindAllCurrentStep(entry.GetEntryId())
-	deleteIds := make([]int, 0)
-	//deleteIds := []int{
-	//	step.ID,
-	//}
-	for _, s := range allCurrentSteps {
-		// 如果要回退的步骤存在于这些步骤的前置中
-		// 那么就删除这些步骤
-		if this.isPrevId(step.ID, s.GetPrevIds()) {
-			deleteIds = append(deleteIds, s.GetStepId())
+func (this *Transition) rollback(targetStep definition.Step, owner int, dueTime time.Time, state string) error {
+	entry := this.vars.Get(tools.Entry).GetData().(spi.Entry)
+	wf := this.vars.Get(tools.Workflow).GetData().(definition.Workflow)
+
+	logrus.Debugln("终止当前流程")
+	deleteCurrentStepIds := make([]int, 0)
+	// 1、先终止 currentStep
+	// 目标回退的步骤是 currentSteps 的前置步骤，删除 currentSteps
+	currentSteps, err := this.properSet.store.FindAllCurrentStep(entry.GetEntryId())
+	if err != nil {
+		return err
+	}
+	for _, s := range currentSteps {
+		if this.isPrevId(targetStep.ID, s.GetPrevIds()) {
+			deleteCurrentStepIds = append(deleteCurrentStepIds, s.GetStepId())
 		}
 	}
-	logrus.Debugln("得到了要删除的进行中的步骤：", deleteIds)
-	logrus.Debugln("删除进行中的步骤")
-	if err = this.properSet.store.DeleteCurrentSteps(deleteIds); err != nil {
-		return err
+	logrus.Debugf("要删除的 currentSteps: %+v", deleteCurrentStepIds)
+	if len(deleteCurrentStepIds) > 0 {
+		if err = this.properSet.store.DeleteCurrentSteps(deleteCurrentStepIds); err != nil {
+			return err
+		}
 	}
 
-	history, err := this.properSet.store.FindHistorySteps(entry.GetEntryId())
-	if err != nil {
-		return err
-	}
+	//historySteps, err := this.properSet.store.FindHistorySteps(entry.GetEntryId())
+	//if err != nil {
+	//	return err
+	//}
 
-	// @todo 这里要加注释，很难说清楚
-	for _, h := range history {
-		deleteIds = append(deleteIds, h.GetStepId())
-	}
+	//deleteJoinTransitionPrevIds := make([]int, 0)
+	//for _, h := range historySteps {
+	//	if this.isPrevId(targetStep.ID, h.GetPrevIds()) {
+	//		deleteJoinTransitionPrevIds = append(deleteJoinTransitionPrevIds, h.GetStepId())
+	//	}
+	//}
+	//logrus.Debugf("要删除的 join_transitions.prev_ids: %+v", deleteJoinTransitionPrevIds)
+	//if len(deleteJoinTransitionPrevIds) > 0 {
+	//	if err = this.properSet.store.DeleteJoinTransitionByPrevIds(entry.GetEntryId(), deleteJoinTransitionPrevIds); err != nil {
+	//		return err
+	//	}
+	//}
 
-	logrus.Debugln("删除所有的join关系")
-	// 删除所有与当前步骤是兄弟步骤的 Join_transition 记录
-	// prev_ids 来源于 deleteIds，因为 deleteIds 代表的是所有要回退的步骤
-	// 那么理所当然的是这些要回退的步骤也要从 join_transition 中删除（因为没有必要等待，后续还会重新生成这些步骤）
-	deleteIds = append(deleteIds, step.ID)
-	if err = this.properSet.store.DeleteJoinTransitionByPrevIds(entry.GetEntryId(), deleteIds); err != nil {
-		return err
-	}
-
-	logrus.Debugln("移动步骤到历史记录")
-	// 从历史记录中找出之前的记录并把 prev_ids 置为其前置ID
-	historyStep, err := this.properSet.store.FindMostRecentHistory(entry.GetEntryId(), step.ID)
-	if err != nil {
-		return err
-	}
-
-	prevIds := historyStep.GetPrevIds()
-	logrus.Debugln("创建新的步骤")
-	// 创建新的步骤
-	newCurrentStep, err := this.properSet.store.CreateCurrentStep(
+	// 2、恢复目标 step
+	history, err := this.properSet.store.FindMostRecentHistory(entry.GetEntryId(), targetStep.ID)
+	newStep, err := this.properSet.store.CreateCurrentStep(
 		entry.GetEntryId(),
-		this.vars.Get(tools.Workflow).GetData().(definition.Workflow),
-		step,
+		wf,
+		targetStep,
 		owner,
 		dueTime,
 		state,
-		prevIds,
+		history.GetPrevIds(),
 	)
-
-	// 发起新路程并进入该步骤
-	trans := NewTransition(
-		this.properSet,
-		this.vars,
-		this.vars.Get(tools.CurrentStep).GetData().(spi.Step),
-		newCurrentStep,
-	)
-
-	logrus.Debugln("进入新创建的步骤")
-	if err = trans.Enter(); err != nil {
+	if err != nil {
 		return err
 	}
 
-	return nil
+	trans := NewTransition(this.properSet, this.vars, this.vars.Get(tools.CurrentStep).GetData().(spi.Step), newStep)
+	return trans.Enter()
+
+	//currentStep := this.vars.Get(tools.CurrentStep).GetData().(spi.Step)
+	//logrus.Println("当前步骤：", currentStep.GetStepId(), "前置步骤:", currentStep.GetPrevIds(), "目标步骤：", targetStep.ID)
+	//wf := this.vars.Get(tools.Workflow).GetData().(definition.Workflow)
+	//for {
+	//	step, err := this.properSet.store.FindMostRecentHistory(entry.GetEntryId(), targetStep.ID)
+	//	if err != nil {
+	//		break
+	//	}
+	//	step.GetActionName()
+	//	stepDef, _ := wf.GetStep(step.GetStepId())
+	//	action, _ := stepDef.GetAction(step.GetActionName())
+	//	results, _ := this.getResult(action.Results)
+	//	logrus.Debugf("results:%+v", results)
+	//	break
+	//}
+
+	//prevIds := currentStep.GetPrevIds()
+	//rollbackStepIds := make([]int, 0)
+	//for i := len(prevIds) - 1; i >= 0; i-- {
+	//	if prevIds[i] == targetStep.ID {
+	//		break
+	//	}
+	//	rollbackStepIds = append(rollbackStepIds, prevIds[i])
+	//}
+	//
+	//logrus.Println("rollbacksStepIds:", rollbackStepIds)
+	return errors.New("break")
 }

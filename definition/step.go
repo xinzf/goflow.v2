@@ -47,7 +47,22 @@ func (static Step) GetAutoActions() []Action {
 		}
 	}
 	return actions
+}
 
+func (static Step) IsTheJoin(joinId int) bool {
+	for _, a := range static.Actions.Actions {
+		for _, r := range a.Results.Results {
+			if r.Join == joinId {
+				return true
+			}
+		}
+		for _, r := range a.Results.Default {
+			if r.Join == joinId {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 //func (static Step) GetDueTime(startTime time.Time) time.Time {

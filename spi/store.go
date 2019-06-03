@@ -46,15 +46,15 @@ type Store interface {
 
 	GetUsersByRoleIds(roleIds []int) ([]User, error)
 
-	CreateJoinTransition(entryId string, currentStep Step, nextId int) error
+	//CreateJoinTransition(entryId string, currentStep Step, nextId int) error
 
-	GetJoinTransitionsByNextId(entryId string, nextId int) ([]JoinTransition, error)
+	//GetJoinTransitionsByNextId(entryId string, nextId int) ([]JoinTransition, error)
 
-	GetJoinTransitionsByPrevId(entryId string, prevId int) (JoinTransition, error)
+	//GetJoinTransitionsByPrevId(entryId string, prevId int) (JoinTransition, error)
 
-	DeleteJoinTransition(entryId string, nextStepId int) error
+	//DeleteJoinTransition(entryId string, nextStepId int) error
 
-	DeleteJoinTransitionByPrevIds(entryId string, prevIds []int) (err error)
+	//DeleteJoinTransitionByPrevIds(entryId string, prevIds []int) (err error)
 
 	GetConn() interface{}
 }
