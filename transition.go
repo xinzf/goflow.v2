@@ -172,6 +172,14 @@ func (this *Transition) DoAction(actionName, remark string) (err error) {
 		return err
 	}
 
+	if len(workflow.Global.PostFunctions.Functions) > 0 {
+		for _, fn := range workflow.Global.PostFunctions.Functions {
+			if _, err = this.triggerFunction(fn); err != nil {
+				return err
+			}
+		}
+	}
+
 	return nil
 }
 

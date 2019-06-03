@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/xinzf/goflow.v2/definition"
 	"github.com/xinzf/goflow.v2/tools"
-)
+	)
 
 type Workflow struct {
 	transientVars *tools.TransientVars

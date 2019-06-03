@@ -2,7 +2,7 @@ package tools
 
 import (
 	"github.com/emirpasic/gods/maps/hashmap"
-)
+	)
 
 const (
 	Entry       string = "entry"

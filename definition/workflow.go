@@ -17,6 +17,7 @@ type Workflow struct {
 	Joins    Joins   `xml:"joins"`
 	Splits   Splits  `xml:"splits"`
 	Extends  Extends `xml:"extends"`
+	Global   Global  `xml:"global"`
 }
 
 func (static Workflow) GetStartStep() (Step, bool) {
