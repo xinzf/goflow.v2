@@ -220,9 +220,16 @@ func (this *Transition) transition(workflow definition.Workflow, currentStep spi
 	if nextStepId == -1 {
 		if result.Status != "" {
 			currentStep.SetState(result.Status)
-			if err = this.properSet.GetStore().UpdateCurrentStep(currentStep); err != nil {
+		}
+		if len(result.Owners.Owners) > 0 {
+			_owner,err:=this.getOwner(result.Owners.Owners)
+			if err != nil {
 				return err
 			}
+			currentStep.SetOwner(_owner)
+		}
+		if err = this.properSet.GetStore().UpdateCurrentStep(currentStep); err != nil {
+			return err
 		}
 		return nil
 	}
